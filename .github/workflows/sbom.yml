@@ -1,0 +1,31 @@
+name: Generate SBOM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Prepare Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install SBOM tool
+        run: npm install -g @cyclonedx/cdxgen
+
+      - name: Generate SBOM
+        run: |
+          mkdir sbom
+          cdxgen -o sbom/bom.json
+
+      - name: Save the SBOM file
+        uses: actions/upload-artifact@v4
+        with:
+          name: cyclonedx-sbom
+          path: sbom/bom.json
